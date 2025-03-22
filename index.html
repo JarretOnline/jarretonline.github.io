@@ -43,6 +43,8 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      cursor: grab;
+      padding: 10px;
     }
 
     video {
@@ -50,7 +52,6 @@
       height: 100%;
       object-fit: cover;
     }
-
     .input-container {
       background-color: #fff;
       padding: 10px;
@@ -84,143 +85,93 @@
       border-radius: 4px;
       cursor: pointer;
     }
-
-    button:hover {
-      background-color: #0056b3;
-    }
-
+    
     .mode-toggle-btn {
       background-color: #007BFF;
-      color: white;
       padding: 10px 15px;
-      border: none;
       border-radius: 5px;
-      cursor: pointer;
       font-size: 16px;
-      margin-bottom: 20px; /* Adds space between the button and the video grid */
-    }
-
-    .mode-toggle-btn:hover {
-      background-color: #0056b3;
-    }
-
-    .toggle-input-btn {
-      background-color: #28a745;
-      color: white;
-      padding: 5px 10px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-bottom: 10px;
-    }
-
-    .toggle-input-btn:hover {
-      background-color: #218838;
-    }
-
-    .input-container {
-      display: none;
+      margin-bottom: 20px;
     }
   </style>
 </head>
-<body class="dark-mode"> <!-- Dark mode enabled by default -->
-  <!-- Button to toggle light/dark mode -->
+<body class="dark-mode"> 
   <button class="mode-toggle-btn" onclick="toggleMode()">💡</button>
-
-  <div class="video-grid">
-    <!-- Video Player 1 -->
-    <div class="video-container">
-      <video id="video1" controls></video>
+  <div class="video-grid" id="videoGrid">
+    <div class="video-container" draggable="true" id="video1">
+      <video id="video1-player" controls></video>
       <button class="toggle-input-btn" onclick="toggleInput('video1')">VIDEO 1</button>
       <div class="input-container" id="input-container-video1">
         <input type="text" id="video1-url" placeholder="Enter HLS stream URL for Video 1">
-        <button onclick="updateVideoSource('video1', 'video1-url')">LOAD</button>
+        <button onclick="updateVideoSource('video1-player', 'video1-url')">LOAD</button>
       </div>
     </div>
-    
-    <!-- Video Player 2 -->
-    <div class="video-container">
-      <video id="video2" controls></video>
+    <div class="video-container" draggable="true" id="video2">
+      <video id="video2-player" controls></video>
       <button class="toggle-input-btn" onclick="toggleInput('video2')">VIDEO 2</button>
       <div class="input-container" id="input-container-video2">
         <input type="text" id="video2-url" placeholder="Enter HLS stream URL for Video 2">
-        <button onclick="updateVideoSource('video2', 'video2-url')">LOAD</button>
+        <button onclick="updateVideoSource('video2-player', 'video2-url')">LOAD</button>
       </div>
     </div>
-    
-    <!-- Video Player 3 -->
-    <div class="video-container">
-      <video id="video3" controls></video>
+    <div class="video-container" draggable="true" id="video3">
+      <video id="video3-player" controls></video>
       <button class="toggle-input-btn" onclick="toggleInput('video3')">VIDEO 3</button>
       <div class="input-container" id="input-container-video3">
         <input type="text" id="video3-url" placeholder="Enter HLS stream URL for Video 3">
-        <button onclick="updateVideoSource('video3', 'video3-url')">LOAD</button>
+        <button onclick="updateVideoSource('video3-player', 'video3-url')">LOAD</button>
       </div>
     </div>
-
-    <!-- Video Player 4 -->
-    <div class="video-container">
-      <video id="video4" controls></video>
+    <div class="video-container" draggable="true" id="video4">
+      <video id="video4-player" controls></video>
       <button class="toggle-input-btn" onclick="toggleInput('video4')">VIDEO 4</button>
       <div class="input-container" id="input-container-video4">
         <input type="text" id="video4-url" placeholder="Enter HLS stream URL for Video 4">
-        <button onclick="updateVideoSource('video4', 'video4-url')">LOAD</button>
+        <button onclick="updateVideoSource('video4-player', 'video4-url')">LOAD</button>
       </div>
     </div>
   </div>
-
   <script>
-    // Function to initialize HLS.js for each video
-    function initHLS(videoId, hlsUrl) {
-      var video = document.getElementById(videoId);
-      
-      if (Hls.isSupported()) {
-        var hls = new Hls();
-        hls.loadSource(hlsUrl);
-        hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, function() {
-          video.play();
-        });
-      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = hlsUrl;
-        video.addEventListener('loadedmetadata', function() {
-          video.play();
-        });
-      }
-    }
-
-    // Function to update the video source from the text input
-    function updateVideoSource(videoId, inputId) {
-      var url = document.getElementById(inputId).value;
-      
-      if (url) {
-        // Call the initHLS function to load the new HLS stream
-        initHLS(videoId, url);
-      } else {
-        alert('Please enter a valid HLS URL.');
-      }
-    }
-
-    // Function to toggle light/dark mode
     function toggleMode() {
       document.body.classList.toggle('dark-mode');
     }
-
-    // Function to toggle visibility of video input container
     function toggleInput(videoId) {
       var inputContainer = document.getElementById('input-container-' + videoId);
-      if (inputContainer.style.display === 'none' || inputContainer.style.display === '') {
-        inputContainer.style.display = 'flex';
+      inputContainer.style.display = inputContainer.style.display === 'none' ? 'flex' : 'none';
+    }
+    function updateVideoSource(videoId, inputId) {
+      var video = document.getElementById(videoId);
+      var url = document.getElementById(inputId).value;
+      if (Hls.isSupported()) {
+        var hls = new Hls();
+        hls.loadSource(url);
+        hls.attachMedia(video);
+      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = url;
       } else {
-        inputContainer.style.display = 'none';
+        alert('Your browser does not support HLS playback.');
       }
     }
-
-    // Initialize the video players with HLS streams
-    initHLS('video1', 'https://path/to/your/stream1.m3u8');
-    initHLS('video2', 'https://path/to/your/stream2.m3u8');
-    initHLS('video3', 'https://path/to/your/stream3.m3u8');
-    initHLS('video4', 'https://path/to/your/stream4.m3u8');
+    const grid = document.getElementById("videoGrid");
+    let draggedItem = null;
+    document.querySelectorAll(".video-container").forEach((item) => {
+      item.addEventListener("dragstart", (e) => {
+        draggedItem = item;
+        e.dataTransfer.effectAllowed = "move";
+      });
+      item.addEventListener("dragover", (e) => {
+        e.preventDefault();
+      });
+      item.addEventListener("drop", (e) => {
+        e.preventDefault();
+        if (draggedItem && draggedItem !== item) {
+          let parent = grid;
+          let draggedIndex = Array.from(parent.children).indexOf(draggedItem);
+          let targetIndex = Array.from(parent.children).indexOf(item);
+          parent.insertBefore(draggedItem, draggedIndex < targetIndex ? item.nextSibling : item);
+        }
+      });
+    });
   </script>
 </body>
 </html>
