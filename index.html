@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tiled Video Players with HLS, Text Box, and Light/Dark Mode</title>
+  <title>QUADBOX</title>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <style>
     /* General styles */
@@ -24,7 +24,7 @@
     }
 
     .dark-mode {
-      background-color: #121212;
+      background-color: #111111;
       color: #ffffff;
     }
 
@@ -34,7 +34,7 @@
       grid-template-rows: repeat(2, 1fr);
       gap: 20px;
       width: 90%;
-      max-width: 1400px;
+      max-width: 1600px;
     }
 
     .video-container {
@@ -63,7 +63,7 @@
     }
 
     .dark-mode .input-container {
-      background-color: #333;
+      background-color: #222;
     }
 
     input[type="text"] {
@@ -74,7 +74,7 @@
     }
 
     .dark-mode input[type="text"] {
-      background-color: #333;
+      background-color: #222;
       color: #fff;
       border: 1px solid #555;
     }
@@ -98,7 +98,7 @@
   </style>
 </head>
 <body class="dark-mode"> 
-  <button class="mode-toggle-btn" onclick="toggleMode()">💡</button>
+  <!-- <button class="mode-toggle-btn" onclick="toggleMode()">💡</button> -->
   <div class="video-grid" id="videoGrid">
     <div class="video-container" draggable="true" id="video1">
       <video id="video1-player" controls></video>
