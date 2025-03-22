@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tiled Video Players with HLS, Text Box, and Light/Dark Mode</title>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <style>
+    /* General styles */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f4f4f4;
+      color: #333;
+      transition: background-color 0.3s, color 0.3s;
+      flex-direction: column;
+    }
+
+    .dark-mode {
+      background-color: #121212;
+      color: #ffffff;
+    }
+
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 20px;
+      width: 80%;
+      max-width: 1200px;
+    }
+
+    .video-container {
+      background-color: #000;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .input-container {
+      background-color: #fff;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .dark-mode .input-container {
+      background-color: #333;
+    }
+
+    input[type="text"] {
+      width: 75%;
+      padding: 5px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+
+    .dark-mode input[type="text"] {
+      background-color: #333;
+      color: #fff;
+      border: 1px solid #555;
+    }
+
+    button {
+      padding: 5px 10px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .mode-toggle-btn {
+      background-color: #007BFF;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-bottom: 20px; /* Adds space between the button and the video grid */
+    }
+
+    .mode-toggle-btn:hover {
+      background-color: #0056b3;
+    }
+
+    .toggle-input-btn {
+      background-color: #28a745;
+      color: white;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+
+    .toggle-input-btn:hover {
+      background-color: #218838;
+    }
+
+    .input-container {
+      display: none;
+    }
+  </style>
+</head>
+<body class="dark-mode"> <!-- Dark mode enabled by default -->
+  <!-- Button to toggle light/dark mode -->
+  <button class="mode-toggle-btn" onclick="toggleMode()">Toggle Light/Dark Mode</button>
+
+  <div class="video-grid">
+    <!-- Video Player 1 -->
+    <div class="video-container">
+      <video id="video1" controls></video>
+      <button class="toggle-input-btn" onclick="toggleInput('video1')">Toggle Input 1</button>
+      <div class="input-container" id="input-container-video1">
+        <input type="text" id="video1-url" placeholder="Enter HLS stream URL for Video 1">
+        <button onclick="updateVideoSource('video1', 'video1-url')">Load Video</button>
+      </div>
+    </div>
+    
+    <!-- Video Player 2 -->
+    <div class="video-container">
+      <video id="video2" controls></video>
+      <button class="toggle-input-btn" onclick="toggleInput('video2')">Toggle Input 2</button>
+      <div class="input-container" id="input-container-video2">
+        <input type="text" id="video2-url" placeholder="Enter HLS stream URL for Video 2">
+        <button onclick="updateVideoSource('video2', 'video2-url')">Load Video</button>
+      </div>
+    </div>
+    
+    <!-- Video Player 3 -->
+    <div class="video-container">
+      <video id="video3" controls></video>
+      <button class="toggle-input-btn" onclick="toggleInput('video3')">Toggle Input 3</button>
+      <div class="input-container" id="input-container-video3">
+        <input type="text" id="video3-url" placeholder="Enter HLS stream URL for Video 3">
+        <button onclick="updateVideoSource('video3', 'video3-url')">Load Video</button>
+      </div>
+    </div>
+
+    <!-- Video Player 4 -->
+    <div class="video-container">
+      <video id="video4" controls></video>
+      <button class="toggle-input-btn" onclick="toggleInput('video4')">Toggle Input 4</button>
+      <div class="input-container" id="input-container-video4">
+        <input type="text" id="video4-url" placeholder="Enter HLS stream URL for Video 4">
+        <button onclick="updateVideoSource('video4', 'video4-url')">Load Video</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Function to initialize HLS.js for each video
+    function initHLS(videoId, hlsUrl) {
+      var video = document.getElementById(videoId);
+      
+      if (Hls.isSupported()) {
+        var hls = new Hls();
+        hls.loadSource(hlsUrl);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, function() {
+          video.play();
+        });
+      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = hlsUrl;
+        video.addEventListener('loadedmetadata', function() {
+          video.play();
+        });
+      }
+    }
+
+    // Function to update the video source from the text input
+    function updateVideoSource(videoId, inputId) {
+      var url = document.getElementById(inputId).value;
+      
+      if (url) {
+        // Call the initHLS function to load the new HLS stream
+        initHLS(videoId, url);
+      } else {
+        alert('Please enter a valid HLS URL.');
+      }
+    }
+
+    // Function to toggle light/dark mode
+    function toggleMode() {
+      document.body.classList.toggle('dark-mode');
+    }
+
+    // Function to toggle visibility of video input container
+    function toggleInput(videoId) {
+      var inputContainer = document.getElementById('input-container-' + videoId);
+      if (inputContainer.style.display === 'none' || inputContainer.style.display === '') {
+        inputContainer.style.display = 'flex';
+      } else {
+        inputContainer.style.display = 'none';
+      }
+    }
+
+    // Initialize the video players with HLS streams
+    initHLS('video1', 'https://path/to/your/stream1.m3u8');
+    initHLS('video2', 'https://path/to/your/stream2.m3u8');
+    initHLS('video3', 'https://path/to/your/stream3.m3u8');
+    initHLS('video4', 'https://path/to/your/stream4.m3u8');
+  </script>
+</body>
+</html>
